@@ -1,11 +1,14 @@
 package model
 
 type Contact struct {
-	UserName string `json:"userName"`
-	Alias    string `json:"alias"`
-	Remark   string `json:"remark"`
-	NickName string `json:"nickName"`
-	IsFriend bool   `json:"isFriend"`
+	UserName       string `json:"userName"`
+	Alias          string `json:"alias"`
+	Remark         string `json:"remark"`
+	NickName       string `json:"nickName"`
+	IsFriend       bool   `json:"isFriend"`
+	BigHeadImgUrl  string `json:"bigHeadImgUrl,omitempty"`
+	SmallHeadImgUrl string `json:"smallHeadImgUrl,omitempty"`
+	HeadImgMd5     string `json:"headImgMd5,omitempty"`
 }
 
 // CREATE TABLE Contact(
@@ -42,20 +45,26 @@ type Contact struct {
 // Reserved11 TEXT
 // )
 type ContactV3 struct {
-	UserName  string `json:"UserName"`
-	Alias     string `json:"Alias"`
-	Remark    string `json:"Remark"`
-	NickName  string `json:"NickName"`
-	Reserved1 int    `json:"Reserved1"` // 1 自己好友或自己加入的群聊; 0 群聊成员(非好友)
+	UserName        string `json:"UserName"`
+	Alias           string `json:"Alias"`
+	Remark          string `json:"Remark"`
+	NickName        string `json:"NickName"`
+	Reserved1       int    `json:"Reserved1"` // 1 自己好友或自己加入的群聊; 0 群聊成员(非好友)
+	BigHeadImgUrl   string `json:"BigHeadImgUrl"`
+	SmallHeadImgUrl string `json:"SmallHeadImgUrl"`
+	HeadImgMd5      string `json:"HeadImgMd5"`
 }
 
 func (c *ContactV3) Wrap() *Contact {
 	return &Contact{
-		UserName: c.UserName,
-		Alias:    c.Alias,
-		Remark:   c.Remark,
-		NickName: c.NickName,
-		IsFriend: c.Reserved1 == 1,
+		UserName:        c.UserName,
+		Alias:           c.Alias,
+		Remark:          c.Remark,
+		NickName:        c.NickName,
+		IsFriend:        c.Reserved1 == 1,
+		BigHeadImgUrl:   c.BigHeadImgUrl,
+		SmallHeadImgUrl: c.SmallHeadImgUrl,
+		HeadImgMd5:      c.HeadImgMd5,
 	}
 }
 

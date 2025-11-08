@@ -1,0 +1,175 @@
+'use client';
+
+import { useState } from 'react';
+import { Download, FileText, Eye } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import type { Message } from '@/libs/ChatlogAPI';
+import {
+  type ExportFormat,
+  downloadExport,
+  generateExportContent,
+  getFormatLabel,
+  getFormatDescription,
+} from '@/utils/exportChatlog';
+
+interface ExportDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  messages: Message[];
+}
+
+export function ExportDialog({ open, onOpenChange, messages }: ExportDialogProps) {
+  const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('txt');
+  const [previewContent, setPreviewContent] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<'format' | 'preview'>('format');
+
+  const formats: ExportFormat[] = ['txt', 'markdown', 'html', 'json', 'csv'];
+
+  const handlePreview = () => {
+    try {
+      const content = generateExportContent(selectedFormat, messages);
+      setPreviewContent(content);
+      setActiveTab('preview');
+    }
+    catch (error) {
+      console.error('Preview error:', error);
+      setPreviewContent('预览失败');
+    }
+  };
+
+  const handleExport = () => {
+    try {
+      downloadExport({
+        format: selectedFormat,
+        messages,
+      });
+      onOpenChange(false);
+    }
+    catch (error) {
+      console.error('Export error:', error);
+    }
+  };
+
+  const getPreviewLanguage = () => {
+    switch (selectedFormat) {
+      case 'json':
+        return 'json';
+      case 'html':
+        return 'html';
+      case 'markdown':
+        return 'markdown';
+      default:
+        return 'text';
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-3xl max-h-[80vh]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            导出聊天记录
+          </DialogTitle>
+          <DialogDescription>
+            选择导出格式并预览内容，共 {messages.length} 条消息
+          </DialogDescription>
+        </DialogHeader>
+
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'format' | 'preview')}>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="format">选择格式</TabsTrigger>
+            <TabsTrigger value="preview">预览内容</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="format" className="space-y-4 mt-4">
+            <RadioGroup value={selectedFormat} onValueChange={(v) => setSelectedFormat(v as ExportFormat)}>
+              <div className="space-y-3">
+                {formats.map(format => (
+                  <div key={format} className="flex items-start space-x-3">
+                    <RadioGroupItem value={format} id={format} className="mt-1" />
+                    <Label
+                      htmlFor={format}
+                      className="flex-1 cursor-pointer hover:bg-accent rounded p-2 -m-2"
+                    >
+                      <div className="font-medium">{getFormatLabel(format)}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {getFormatDescription(format)}
+                      </div>
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </RadioGroup>
+          </TabsContent>
+
+          <TabsContent value="preview" className="mt-4">
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <Label className="text-sm text-muted-foreground">
+                  格式: {getFormatLabel(selectedFormat)}
+                </Label>
+                <Button variant="outline" size="sm" onClick={handlePreview}>
+                  <Eye className="mr-2 h-4 w-4" />
+                  刷新预览
+                </Button>
+              </div>
+
+              <ScrollArea className="h-[400px] w-full rounded-md border">
+                <div className="p-4">
+                  {previewContent ? (
+                    selectedFormat === 'html' ? (
+                      <iframe
+                        srcDoc={previewContent}
+                        className="w-full h-[380px] border-0"
+                        title="HTML Preview"
+                      />
+                    ) : (
+                      <pre className="text-xs whitespace-pre-wrap break-words font-mono">
+                        <code className={`language-${getPreviewLanguage()}`}>
+                          {previewContent.length > 50000
+                            ? `${previewContent.slice(0, 50000)}\n\n... (内容过长，已截断，实际导出文件将包含完整内容)`
+                            : previewContent}
+                        </code>
+                      </pre>
+                    )
+                  ) : (
+                    <div className="text-center text-muted-foreground py-8">
+                      点击"刷新预览"按钮查看导出内容
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        <DialogFooter className="flex gap-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            取消
+          </Button>
+          <Button variant="secondary" onClick={handlePreview}>
+            <Eye className="mr-2 h-4 w-4" />
+            预览
+          </Button>
+          <Button onClick={handleExport}>
+            <Download className="mr-2 h-4 w-4" />
+            导出
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
