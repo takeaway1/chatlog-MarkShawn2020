@@ -58,6 +58,19 @@ func (r *Repository) enrichMessage(msg *model.Message) {
 			msg.SenderName = contact.DisplayName()
 		}
 	}
+
+	// 补充发送者头像
+	if msg.SenderAvatar == "" {
+		contact := r.getFullContact(msg.Sender)
+		if contact != nil {
+			// 优先使用小头像，如果没有则使用大头像
+			if contact.SmallHeadImgUrl != "" {
+				msg.SenderAvatar = contact.SmallHeadImgUrl
+			} else if contact.BigHeadImgUrl != "" {
+				msg.SenderAvatar = contact.BigHeadImgUrl
+			}
+		}
+	}
 }
 
 func (r *Repository) parseTalkerAndSender(ctx context.Context, talker, sender string) (string, string) {

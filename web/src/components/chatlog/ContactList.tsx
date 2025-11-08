@@ -86,7 +86,7 @@ export function ContactList() {
                   >
                     <Avatar>
                       <AvatarImage
-                        src={contact.contactHeadImgUrl?.smallHeadImgUrl}
+                        src={contact.smallHeadImgUrl || contact.bigHeadImgUrl}
                         alt={contact.nickName || contact.userName}
                       />
                       <AvatarFallback>

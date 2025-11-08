@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, MessageSquare, Download, AlertCircle, Image as ImageIcon } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Loader2, MessageSquare, Download, AlertCircle, Image as ImageIcon, User } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { chatlogAPI } from '@/libs/ChatlogAPI';
@@ -224,16 +225,18 @@ export function ChatlogViewer() {
                     >
                       {/* Avatar */}
                       <div className="flex-shrink-0 mt-1">
-                        <div className={`w-10 h-10 rounded flex items-center justify-center text-xs font-medium ${
-                          message.isSender
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-muted'
-                        }`}>
-                          {message.isSender
-                            ? '我'
-                            : (message.sender || message.talker || '?').slice(0, 2).toUpperCase()
-                          }
-                        </div>
+                        <Avatar className="w-10 h-10">
+                          <AvatarImage
+                            src={message.senderAvatar}
+                            alt={message.senderName || message.sender || '用户'}
+                          />
+                          <AvatarFallback className={message.isSender ? 'bg-primary text-primary-foreground' : 'bg-muted'}>
+                            {message.isSender
+                              ? '我'
+                              : (message.senderName || message.sender || '?').slice(0, 2).toUpperCase()
+                            }
+                          </AvatarFallback>
+                        </Avatar>
                       </div>
 
                       {/* Message bubble */}
@@ -241,7 +244,7 @@ export function ChatlogViewer() {
                         {/* Sender name and time */}
                         <div className={`flex gap-2 items-center mb-1 px-1 ${message.isSender ? 'flex-row-reverse' : 'flex-row'}`}>
                           <span className="text-xs text-muted-foreground font-medium">
-                            {message.isSender ? '我' : (message.sender || message.talker)}
+                            {message.isSender ? '我' : (message.senderName || message.sender || message.talker)}
                           </span>
                           <span className="text-xs text-muted-foreground">
                             {formatTime(message.createTime)}
