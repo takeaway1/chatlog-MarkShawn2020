@@ -28,7 +28,7 @@ export function ConversationListPanel() {
   // Fetch contacts
   const { data: contacts, isLoading: isLoadingContacts, error: contactsError } = useQuery({
     queryKey: ['contacts'],
-    queryFn: () => chatlogAPI.getContacts({ format: 'json' }),
+    queryFn: () => chatlogAPI.getContacts({ format: 'json', limit: 1000 }),
     enabled: activeSection === 'contacts',
     staleTime: 1000 * 60 * 30, // Cache for 30 minutes (contacts change less frequently)
     gcTime: 1000 * 60 * 60, // Keep in cache for 1 hour
@@ -37,7 +37,7 @@ export function ConversationListPanel() {
   // Fetch chatrooms
   const { data: chatrooms, isLoading: isLoadingChatrooms, error: chatroomsError } = useQuery({
     queryKey: ['chatrooms'],
-    queryFn: () => chatlogAPI.getChatRooms({ format: 'json' }),
+    queryFn: () => chatlogAPI.getChatRooms({ format: 'json', limit: 1000 }),
     enabled: activeSection === 'groups',
     staleTime: 1000 * 60 * 30, // Cache for 30 minutes
     gcTime: 1000 * 60 * 60, // Keep in cache for 1 hour
@@ -81,7 +81,7 @@ export function ConversationListPanel() {
           type: 'contact' as const,
           id: contact.userName,
           displayName: contact.remark || contact.nickName || contact.userName,
-          avatar: contact.contactHeadImgUrl?.smallHeadImgUrl,
+          avatar: contact.smallHeadImgUrl || contact.bigHeadImgUrl,
           subtitle: contact.userName,
         }));
     }

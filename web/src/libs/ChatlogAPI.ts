@@ -48,28 +48,12 @@ export interface Message {
 export interface Contact {
   userName: string;
   alias: string;
-  encryptUserName: string;
-  delFlag: number;
-  type: number;
-  verifyFlag: number;
-  reserved1: number;
-  reserved2: number;
-  reserved3: string;
-  reserved4: string;
   remark: string;
-  remarkPYInitial: string;
-  remarkPYFull: string;
   nickName: string;
-  nickNamePYInitial: string;
-  nickNamePYFull: string;
-  labelIDList: string;
-  domainList: string;
-  chatRoomType: number;
-  pythonList: string;
-  contactHeadImgUrl: {
-    smallHeadImgUrl: string;
-    bigHeadImgUrl: string;
-  };
+  isFriend: boolean;
+  bigHeadImgUrl?: string;
+  smallHeadImgUrl?: string;
+  headImgMd5?: string;
 }
 
 export interface ContactList {
