@@ -2,59 +2,106 @@
 
 import { useAtom } from 'jotai';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { SessionList } from './SessionList';
 import { ChatRoomList } from './ChatRoomList';
 import { ContactList } from './ContactList';
 import { ChatlogViewer } from './ChatlogViewer';
 import { activeTabAtom } from '@/stores/chatlogStore';
+import { MessageCircle, Users, UserCircle, MessageSquare } from 'lucide-react';
 
 export function ChatlogDashboard() {
   const [activeTab, setActiveTab] = useAtom(activeTabAtom);
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="mb-8 text-center">
-        <h1 className="text-4xl font-bold mb-4">🎉 Chatlog 服务已成功启动</h1>
-        <p className="text-muted-foreground">
-          Chatlog 是一个帮助你轻松使用自己聊天数据的工具，现在你可以通过 HTTP API 访问你的聊天记录、联系人和群聊信息。
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 dark:from-gray-950 dark:via-gray-900 dark:to-purple-950">
+      <div className="container mx-auto py-6 px-4 md:py-12 md:px-6">
+        {/* Hero Section */}
+        <div className="mb-8 md:mb-12 text-center space-y-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white text-sm font-medium shadow-lg shadow-pink-500/30">
+            <MessageCircle className="w-4 h-4" />
+            <span>服务运行中</span>
+          </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>🔍 API 接口与调试</CardTitle>
-          <CardDescription>
-            使用下面的选项卡来查询你的聊天数据
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+            欢迎使用 Lovchat
+          </h1>
+
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
+            你的专属聊天助手，让珍贵的对话永不丢失
+          </p>
+        </div>
+
+        {/* Main Content */}
+        <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 border-0 shadow-2xl">
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="session">最近会话</TabsTrigger>
-              <TabsTrigger value="chatroom">群聊</TabsTrigger>
-              <TabsTrigger value="contact">联系人</TabsTrigger>
-              <TabsTrigger value="chatlog">聊天记录</TabsTrigger>
-            </TabsList>
+            <div className="border-b bg-gradient-to-r from-pink-50 to-purple-50 dark:from-gray-800 dark:to-purple-900/20">
+              <TabsList className="w-full h-auto bg-transparent grid grid-cols-2 md:grid-cols-4 gap-2 p-4">
+                <TabsTrigger
+                  value="session"
+                  className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-md data-[state=active]:text-pink-600 dark:data-[state=active]:text-pink-400 rounded-lg py-3"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  <span className="hidden sm:inline">最近会话</span>
+                  <span className="sm:hidden">会话</span>
+                </TabsTrigger>
 
-            <TabsContent value="session" className="mt-6">
-              <SessionList />
-            </TabsContent>
+                <TabsTrigger
+                  value="chatroom"
+                  className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-md data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400 rounded-lg py-3"
+                >
+                  <Users className="w-4 h-4" />
+                  <span className="hidden sm:inline">群聊</span>
+                  <span className="sm:hidden">群聊</span>
+                </TabsTrigger>
 
-            <TabsContent value="chatroom" className="mt-6">
-              <ChatRoomList />
-            </TabsContent>
+                <TabsTrigger
+                  value="contact"
+                  className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-md data-[state=active]:text-pink-600 dark:data-[state=active]:text-pink-400 rounded-lg py-3"
+                >
+                  <UserCircle className="w-4 h-4" />
+                  <span className="hidden sm:inline">联系人</span>
+                  <span className="sm:hidden">联系人</span>
+                </TabsTrigger>
 
-            <TabsContent value="contact" className="mt-6">
-              <ContactList />
-            </TabsContent>
+                <TabsTrigger
+                  value="chatlog"
+                  className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-md data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400 rounded-lg py-3"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span className="hidden sm:inline">聊天记录</span>
+                  <span className="sm:hidden">记录</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
-            <TabsContent value="chatlog" className="mt-6">
-              <ChatlogViewer />
-            </TabsContent>
+            <div className="p-4 md:p-6">
+              <TabsContent value="session" className="mt-0">
+                <SessionList />
+              </TabsContent>
+
+              <TabsContent value="chatroom" className="mt-0">
+                <ChatRoomList />
+              </TabsContent>
+
+              <TabsContent value="contact" className="mt-0">
+                <ContactList />
+              </TabsContent>
+
+              <TabsContent value="chatlog" className="mt-0">
+                <ChatlogViewer />
+              </TabsContent>
+            </div>
           </Tabs>
-        </CardContent>
-      </Card>
+        </Card>
+
+        {/* Footer Hint */}
+        <div className="mt-8 text-center">
+          <p className="text-sm text-muted-foreground">
+            Lovchat 已为您准备就绪 • 所有数据仅存储在本地
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
