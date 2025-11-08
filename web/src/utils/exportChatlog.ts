@@ -120,6 +120,26 @@ export function exportToHTML(messages: Message[]): string {
 </html>`;
 }
 
+function getImageUrl(message: Message): string | null {
+  if (message.type !== 3 || !message.contents) {
+    return null;
+  }
+
+  const baseURL = typeof window !== 'undefined'
+    ? (process.env.NEXT_PUBLIC_CHATLOG_API_URL || window.location.origin)
+    : (process.env.NEXT_PUBLIC_CHATLOG_API_URL || 'http://localhost:5030');
+
+  if (message.contents.md5) {
+    return `${baseURL}/image/${message.contents.md5}`;
+  }
+
+  if (message.contents.imgfile) {
+    return `${baseURL}/data/${message.contents.imgfile}`;
+  }
+
+  return null;
+}
+
 export function exportToMarkdown(messages: Message[]): string {
   const header = `# 聊天记录导出
 
@@ -134,8 +154,20 @@ export function exportToMarkdown(messages: Message[]): string {
     .map((msg) => {
       const time = formatTime(msg.createTime);
       const sender = msg.isSender ? '我' : (msg.sender || msg.talker);
-      const content = msg.displayContent || msg.content || '[无内容]';
-      const typeInfo = msg.type !== 1 ? ` *(类型: ${msg.type})*` : '';
+      const isImageMsg = msg.type === 3;
+      const typeInfo = msg.type !== 1 && msg.type !== 3 ? ` *(类型: ${msg.type})*` : '';
+
+      let content = msg.displayContent || msg.content || '[无内容]';
+
+      if (isImageMsg) {
+        const imageUrl = getImageUrl(msg);
+        if (imageUrl) {
+          content = `![图片](${imageUrl})`;
+        }
+        else {
+          content = '[图片消息]';
+        }
+      }
 
       return `### ${sender}
 *${time}*${typeInfo}
@@ -155,7 +187,19 @@ export function exportToInterview(messages: Message[]): string {
 
   for (const msg of messages) {
     const sender = msg.isSender ? '我' : (msg.senderName || msg.sender || msg.talker);
-    const content = msg.displayContent || msg.content || '[无内容]';
+    const isImageMsg = msg.type === 3;
+
+    let content = msg.displayContent || msg.content || '[无内容]';
+
+    if (isImageMsg) {
+      const imageUrl = getImageUrl(msg);
+      if (imageUrl) {
+        content = `![图片](${imageUrl})`;
+      }
+      else {
+        content = '[图片消息]';
+      }
+    }
 
     if (sender !== lastSender) {
       parts.push(`**${sender}**: ${content}`);
