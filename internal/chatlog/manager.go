@@ -110,7 +110,7 @@ func (m *Manager) StartService() error {
 	// 如果是 4.0 版本，更新下 xorkey
 	if m.ctx.Version == 4 {
 		dat2img.SetAesKey(m.ctx.ImgKey)
-		go dat2img.ScanAndSetXorKey(m.ctx.DataDir)
+		dat2img.ScanAndSetXorKey(m.ctx.DataDir)
 	}
 
 	// 更新状态

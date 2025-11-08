@@ -253,19 +253,50 @@ func Dat2ImageV4(data []byte, aeskey []byte) ([]byte, string, error) {
 	}
 
 	// Process XOR-encrypted part (file tail)
+	// Try multiple XOR keys if the primary one fails
+	xorKeys := []byte{V4XorKey, 0xDF, 0xE5} // Try scanned key, then common alternatives
+	var bestResult []byte
+	var bestExt string
+
 	if xorEncryptLen > 0 && middleEnd < uint32(len(fileData)) {
 		xorData := fileData[middleEnd:]
 
-		// Apply XOR decryption using global key
-		xorDecrypted := make([]byte, len(xorData))
-		for i := range xorData {
-			xorDecrypted[i] = xorData[i] ^ V4XorKey
-		}
+		for _, xorKey := range xorKeys {
+			// Apply XOR decryption
+			xorDecrypted := make([]byte, len(xorData))
+			for i := range xorData {
+				xorDecrypted[i] = xorData[i] ^ xorKey
+			}
 
-		result = append(result, xorDecrypted...)
+			testResult := append([]byte{}, result...)
+			testResult = append(testResult, xorDecrypted...)
+
+			// Check if this produces a valid image
+			for _, format := range Formats {
+				if len(testResult) >= len(format.Header) && bytes.Equal(testResult[:len(format.Header)], format.Header) {
+					if format.Ext == "wxgf" {
+						wxgfResult, ext, err := Wxam2pic(testResult)
+						if err == nil {
+							return wxgfResult, ext, nil
+						}
+					} else {
+						// Keep the first valid result, but prefer larger images
+						if bestResult == nil || len(testResult) > len(bestResult) {
+							bestResult = testResult
+							bestExt = format.Ext
+						}
+					}
+					break
+				}
+			}
+		}
 	}
 
-	// Identify image type from decrypted data
+	if bestResult != nil {
+		return bestResult, bestExt, nil
+	}
+
+	// Identify image type from decrypted data (fallback)
 	imgType := ""
 	for _, format := range Formats {
 		if len(result) >= len(format.Header) && bytes.Equal(result[:len(format.Header)], format.Header) {
