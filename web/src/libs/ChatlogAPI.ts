@@ -82,6 +82,7 @@ export interface Session {
   content: string;
   nTime: string;
   nUnReadCount: number;
+  avatarUrl?: string;
 }
 
 export interface SessionList {

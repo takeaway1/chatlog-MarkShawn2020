@@ -11,6 +11,12 @@ import { activeSectionAtom, selectedConversationAtom, type SelectedConversation 
 import { chatlogAPI } from '@/libs/ChatlogAPI';
 import { useState, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import 'dayjs/locale/zh-cn';
+
+dayjs.extend(relativeTime);
+dayjs.locale('zh-cn');
 
 export function ConversationListPanel() {
   const [activeSection] = useAtom(activeSectionAtom);
@@ -109,9 +115,9 @@ export function ConversationListPanel() {
           type: 'session' as const,
           id: session.userName,
           displayName: session.nickName || session.userName,
-          avatar: undefined,
+          avatar: session.avatarUrl,
           subtitle: session.content,
-          time: session.nTime,
+          time: dayjs(session.nTime).fromNow(),
           unreadCount: session.nUnReadCount,
         }));
     }
