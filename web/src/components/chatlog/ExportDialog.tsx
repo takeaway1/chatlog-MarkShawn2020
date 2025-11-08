@@ -37,12 +37,12 @@ interface SenderRename {
 }
 
 export function ExportDialog({ open, onOpenChange, messages }: ExportDialogProps) {
-  const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('txt');
+  const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('interview');
   const [previewContent, setPreviewContent] = useState<string>('');
   const [filterSystemMessages, setFilterSystemMessages] = useState(false);
   const [senderRenames, setSenderRenames] = useState<SenderRename>({});
 
-  const formats: ExportFormat[] = ['txt', 'markdown', 'interview', 'html', 'json', 'csv'];
+  const formats: ExportFormat[] = ['interview', 'txt', 'markdown', 'html', 'json', 'csv'];
 
   // 获取所有唯一的发送者
   const uniqueSenders = useMemo(() => {
@@ -53,12 +53,47 @@ export function ExportDialog({ open, onOpenChange, messages }: ExportDialogProps
     ).sort();
   }, [messages]);
 
+  // 判断是否为系统消息
+  const isSystemMessage = (msg: Message): boolean => {
+    const sender = msg.sender || msg.talker || '';
+    const content = msg.displayContent || msg.content || '';
+
+    // 发送者为"系统消息"
+    if (sender === '系统消息' || sender.includes('系统')) {
+      return true;
+    }
+
+    // 内容包含系统提示关键词
+    const systemKeywords = [
+      '撤回了一条消息',
+      '拍了拍',
+      '加入了群聊',
+      '退出了群聊',
+      '修改群名为',
+      '邀请',
+      '加入群聊',
+      '开启了群聊邀请确认',
+      '关闭了群聊邀请确认',
+    ];
+
+    if (systemKeywords.some(keyword => content.includes(keyword))) {
+      return true;
+    }
+
+    // type > 10000 的系统消息
+    if (msg.type > 10000) {
+      return true;
+    }
+
+    return false;
+  };
+
   // 应用过滤和重命名
   const processedMessages = useMemo(() => {
     return messages
       .filter(msg => {
-        // 过滤系统消息（type > 10000 通常是系统消息）
-        if (filterSystemMessages && msg.type > 10000) {
+        // 过滤系统消息
+        if (filterSystemMessages && isSystemMessage(msg)) {
           return false;
         }
         return true;
