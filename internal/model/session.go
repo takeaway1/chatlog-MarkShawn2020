@@ -15,10 +15,10 @@ type Session struct {
 	ParentRef    string    `json:"parentRef"`
 	NUnReadCount int       `json:"nUnReadCount"`
 
-	// Extended fields for UI features
+	// Extended fields for UI features (WeChat 4.x fully supported, WeChat 3.x limited)
 	IsTopPinned  bool      `json:"isTopPinned,omitempty"`  // Whether session is pinned to top
 	IsHidden     bool      `json:"isHidden,omitempty"`     // Whether session is minimized/hidden
-	SortOrder    int64     `json:"sortOrder,omitempty"`    // Sort timestamp for ordering
+	SortOrder    int64     `json:"sortOrder"`              // Sort timestamp for ordering (always present)
 }
 
 // CREATE TABLE Session(

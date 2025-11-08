@@ -44,10 +44,11 @@ type SessionV4 struct {
 }
 
 func (s *SessionV4) Wrap() *Session {
-	// Determine if session is pinned: sort_timestamp significantly larger than last_timestamp
-	// Typically, pinned sessions have sort_timestamp set to a very large value (e.g., far in the future)
-	const pinnedThreshold = 86400 * 365 * 10 // 10 years in seconds
-	isTopPinned := s.SortTimestamp > int64(s.LastTimestamp)+pinnedThreshold
+	// Determine if session is pinned:
+	// When a session is pinned, WeChat updates sort_timestamp to the pin operation time,
+	// which will be greater than last_timestamp (the last message time)
+	// Note: sort_timestamp is updated to current time when pinning, not a far future value
+	isTopPinned := s.SortTimestamp > int64(s.LastTimestamp)
 
 	return &Session{
 		UserName:     s.Username,
