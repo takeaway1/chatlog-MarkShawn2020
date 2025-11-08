@@ -9,7 +9,8 @@ import { Loader2, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { activeSectionAtom, selectedConversationAtom, type SelectedConversation } from '@/stores/chatlogStore';
 import { chatlogAPI } from '@/libs/ChatlogAPI';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
+import { useInView } from 'react-intersection-observer';
 
 export function ConversationListPanel() {
   const [activeSection] = useAtom(activeSectionAtom);
@@ -76,35 +77,21 @@ export function ConversationListPanel() {
   const contacts = contactsData?.pages.flatMap(page => page.items) ?? [];
   const chatrooms = chatroomsData?.pages.flatMap(page => page.items) ?? [];
 
-  // Infinite scroll observer
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const observerTarget = useRef<HTMLDivElement>(null);
+  // Infinite scroll observer using useInView hook
+  const { ref: loadMoreRef, inView } = useInView({
+    threshold: 0,
+    rootMargin: '100px',
+  });
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      entries => {
-        if (entries[0]?.isIntersecting) {
-          if (activeSection === 'contacts' && hasNextContactsPage && !isFetchingNextContactsPage) {
-            fetchNextContactsPage();
-          } else if (activeSection === 'groups' && hasNextChatroomsPage && !isFetchingNextChatroomsPage) {
-            fetchNextChatroomsPage();
-          }
-        }
-      },
-      { threshold: 0.5 }
-    );
-
-    const target = observerTarget.current;
-    if (target) {
-      observer.observe(target);
-    }
-
-    return () => {
-      if (target) {
-        observer.unobserve(target);
+    if (inView) {
+      if (activeSection === 'contacts' && hasNextContactsPage && !isFetchingNextContactsPage) {
+        fetchNextContactsPage();
+      } else if (activeSection === 'groups' && hasNextChatroomsPage && !isFetchingNextChatroomsPage) {
+        fetchNextChatroomsPage();
       }
-    };
-  }, [activeSection, hasNextContactsPage, hasNextChatroomsPage, isFetchingNextContactsPage, isFetchingNextChatroomsPage, fetchNextContactsPage, fetchNextChatroomsPage]);
+    }
+  }, [inView, activeSection, hasNextContactsPage, hasNextChatroomsPage, isFetchingNextContactsPage, isFetchingNextChatroomsPage, fetchNextContactsPage, fetchNextChatroomsPage]);
 
   // Filter and map data based on active section
   const items = (() => {
@@ -262,9 +249,12 @@ export function ConversationListPanel() {
 
             {/* Infinite scroll trigger and loading indicator */}
             {(activeSection === 'contacts' || activeSection === 'groups') && (
-              <div ref={observerTarget} className="py-4 flex justify-center">
+              <div ref={loadMoreRef} className="py-4 flex justify-center">
                 {(isFetchingNextContactsPage || isFetchingNextChatroomsPage) && (
                   <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                )}
+                {!isFetchingNextContactsPage && !isFetchingNextChatroomsPage && (hasNextContactsPage || hasNextChatroomsPage) && (
+                  <span className="text-xs text-muted-foreground">加载更多...</span>
                 )}
               </div>
             )}
