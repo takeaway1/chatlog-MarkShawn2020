@@ -10,7 +10,7 @@ import { Loader2, MessageSquare, Download, Image as ImageIcon, ArrowLeft } from 
 import { selectedConversationAtom, conversationMessagesAtom, exportDialogOpenAtom } from '@/stores/chatlogStore';
 import { chatlogAPI, type Message } from '@/libs/ChatlogAPI';
 import { format } from 'date-fns';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { ExportDialog } from './ExportDialog';
 
 export function ChatPanel() {
@@ -18,26 +18,10 @@ export function ChatPanel() {
   const [messages, setMessages] = useAtom(conversationMessagesAtom);
   const [exportDialogOpen, setExportDialogOpen] = useAtom(exportDialogOpenAtom);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     console.log('🎯 [ChatPanel] selectedConversation changed:', selectedConversation);
   }, [selectedConversation]);
-
-  // Auto scroll to bottom when messages load/change (no animation)
-  useEffect(() => {
-    if (messages.length > 0 && messagesContainerRef.current) {
-      // Double requestAnimationFrame to ensure DOM has been fully rendered
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          if (messagesContainerRef.current) {
-            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
-            console.log('📜 Scrolled to:', messagesContainerRef.current.scrollTop, 'of', messagesContainerRef.current.scrollHeight);
-          }
-        });
-      });
-    }
-  }, [messages]);
 
   // Fetch messages when conversation is selected
   const { data, isLoading, error } = useQuery({
@@ -138,7 +122,7 @@ export function ChatPanel() {
       </div>
 
       {/* Messages */}
-      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto overflow-x-hidden">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden flex flex-col-reverse">
         {error ? (
           <div className="flex items-center justify-center h-full p-4">
             <div className="text-center text-muted-foreground">
@@ -162,15 +146,15 @@ export function ChatPanel() {
             </div>
           </div>
         ) : (
-          <div className="space-y-4 max-w-4xl mx-auto p-4 md:p-6 min-w-0 w-full">
-            {messages.map((message, index) => {
+          <div className="space-y-4 max-w-4xl mx-auto p-4 md:p-6 min-w-0 w-full flex flex-col-reverse">
+            {messages.slice().reverse().map((message) => {
               const isSystemMsg = message.type === 10000;
               const isImageMsg = message.type === 3;
               const isReferMsg = message.type === 49 && message.subType === 57;
 
               if (isSystemMsg) {
                 return (
-                  <div key={index} className="flex justify-center py-1">
+                  <div key={message.seq} className="flex justify-center py-1">
                     <div className="text-xs text-muted-foreground bg-muted/50 px-3 py-1 rounded">
                       系统消息
                     </div>
@@ -180,7 +164,7 @@ export function ChatPanel() {
 
               return (
                 <div
-                  key={index}
+                  key={message.seq}
                   className={`flex gap-3 w-full ${message.isSelf ? 'flex-row-reverse' : 'flex-row'}`}
                 >
                   {/* Avatar */}
