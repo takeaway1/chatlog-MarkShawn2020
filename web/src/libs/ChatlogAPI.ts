@@ -83,9 +83,6 @@ export interface Session {
   nTime: string;
   nUnReadCount: number;
   avatarUrl?: string;
-  isTopPinned?: boolean;
-  isHidden?: boolean;
-  sortOrder?: number;
 }
 
 export interface SessionList {

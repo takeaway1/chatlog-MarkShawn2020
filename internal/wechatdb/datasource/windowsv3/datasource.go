@@ -463,6 +463,12 @@ func (ds *DataSource) GetContacts(ctx context.Context, key string, limit, offset
 	return contacts, nil
 }
 
+// GetPinnedUserNames 获取所有置顶的用户名列表 (WeChat 3.x may not support this feature)
+func (ds *DataSource) GetPinnedUserNames(ctx context.Context) ([]string, error) {
+	// WeChat 3.x 不支持置顶功能，返回空列表
+	return []string{}, nil
+}
+
 // GetChatRooms 实现获取群聊信息的方法
 func (ds *DataSource) GetChatRooms(ctx context.Context, key string, limit, offset int) ([]*model.ChatRoom, error) {
 	var query string
@@ -592,15 +598,15 @@ func (ds *DataSource) GetSessions(ctx context.Context, key string, limit, offset
 
 	if key != "" {
 		// 按照关键字查询
-		query = `SELECT strUsrName, nOrder, strNickName, strContent, nTime, parentRef
-                FROM Session
+		query = `SELECT strUsrName, nOrder, strNickName, strContent, nTime 
+                FROM Session 
                 WHERE strUsrName = ? OR strNickName = ?
                 ORDER BY nOrder DESC`
 		args = []interface{}{key, key}
 	} else {
 		// 查询所有会话
-		query = `SELECT strUsrName, nOrder, strNickName, strContent, nTime, parentRef
-                FROM Session
+		query = `SELECT strUsrName, nOrder, strNickName, strContent, nTime 
+                FROM Session 
                 ORDER BY nOrder DESC`
 	}
 
@@ -632,7 +638,6 @@ func (ds *DataSource) GetSessions(ctx context.Context, key string, limit, offset
 			&sessionV3.StrNickName,
 			&sessionV3.StrContent,
 			&sessionV3.NTime,
-			&sessionV3.ParentRef,
 		)
 
 		if err != nil {
