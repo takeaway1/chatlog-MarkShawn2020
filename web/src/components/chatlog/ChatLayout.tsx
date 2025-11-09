@@ -7,6 +7,7 @@ import { ConversationListPanel } from './ConversationListPanel';
 import { ChatPanel } from './ChatPanel';
 import { selectedConversationAtom } from '@/stores/chatlogStore';
 import { APP_VERSION } from '@/utils/version';
+import { Badge } from '@/components/ui/badge';
 
 export function ChatLayout() {
   const [selectedConversation] = useAtom(selectedConversationAtom);
@@ -21,7 +22,10 @@ export function ChatLayout() {
               <MessageCircle className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-lg font-semibold">Lovchat <span className="text-xs text-muted-foreground font-normal">v{APP_VERSION}</span></h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg font-semibold">Lovchat</h1>
+                <Badge variant="secondary" className="text-xs">v{APP_VERSION}</Badge>
+              </div>
               <p className="text-xs text-muted-foreground">微信聊天记录查看器</p>
             </div>
           </div>
