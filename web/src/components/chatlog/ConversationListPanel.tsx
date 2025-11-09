@@ -336,7 +336,7 @@ export function ConversationListPanel() {
           </div>
         ) : (
           <>
-            <div className="divide-y divide-border">
+            <div>
               {items.map((item) => {
                 const isSelected = selectedConversation?.id === item.id && selectedConversation?.type === item.type;
                 const isPinned = 'isPinned' in item && item.isPinned;
@@ -348,7 +348,7 @@ export function ConversationListPanel() {
                     className={cn(
                       'w-full p-4 flex items-start gap-3 hover:bg-accent/50 transition-colors text-left',
                       isSelected && 'bg-accent',
-                      isPinned && 'bg-muted/20 border-l-2 border-muted-foreground/10'
+                      isPinned && 'bg-muted/40 border-l-[3px] border-muted-foreground/30'
                     )}
                   >
                     <Avatar className="w-12 h-12 flex-shrink-0">
