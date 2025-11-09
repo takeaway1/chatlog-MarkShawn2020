@@ -222,6 +222,7 @@ export function ConversationListPanel() {
 
     if (activeSection === 'chats') {
       return sessions
+        .filter(s => !s.userName.startsWith('gh_')) // 过滤掉公众号
         .filter(s =>
           !keyword ||
           s.userName.toLowerCase().includes(keyword) ||
