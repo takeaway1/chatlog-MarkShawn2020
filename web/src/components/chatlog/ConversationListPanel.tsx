@@ -290,7 +290,7 @@ export function ConversationListPanel() {
   return (
     <div className="w-80 shrink-0 bg-background border-r border-border flex flex-col min-w-0">
       {/* Search bar */}
-      <div className="p-4 border-b border-border">
+      <div className="p-4 border-b border-border space-y-2">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -299,6 +299,17 @@ export function ConversationListPanel() {
             onChange={(e) => setSearchKeyword(e.target.value)}
             className="pl-9"
           />
+        </div>
+        {/* Show loaded count */}
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span>
+            已加载 {activeSection === 'chats' ? sessions.length : activeSection === 'contacts' ? contacts.length : chatrooms.length} 条
+          </span>
+          {((activeSection === 'chats' && hasNextSessionsPage) ||
+            (activeSection === 'contacts' && hasNextContactsPage) ||
+            (activeSection === 'groups' && hasNextChatroomsPage)) && (
+            <span>还有更多...</span>
+          )}
         </div>
       </div>
 
