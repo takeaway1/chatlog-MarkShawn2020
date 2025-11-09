@@ -50,6 +50,7 @@ func (s *Service) initMediaRouter() {
 	s.router.GET("/file/*key", func(c *gin.Context) { s.handleMedia(c, "file") })
 	s.router.GET("/voice/*key", func(c *gin.Context) { s.handleMedia(c, "voice") })
 	s.router.GET("/data/*path", s.handleMediaData)
+	s.router.GET("/group-avatar/*id", s.handleGroupAvatar)
 }
 
 func (s *Service) initAPIRouter() {

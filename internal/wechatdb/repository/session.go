@@ -75,7 +75,7 @@ func (r *Repository) GetSessions(ctx context.Context, key string, limit, offset 
 			session.IsMinimized = contact.IsMinimized
 		} else {
 			// Try to get chatroom/group contact info directly from contact table
-			// (GetContacts excludes chatrooms, so we query directly here)
+			// (GetContacts allows chatrooms when searching by specific key)
 			if strings.Contains(session.UserName, "@chatroom") {
 				contacts, err := r.ds.GetContacts(ctx, session.UserName, 1, 0)
 				if err == nil && len(contacts) > 0 {
@@ -88,6 +88,11 @@ func (r *Repository) GetSessions(ctx context.Context, key string, limit, offset 
 					}
 					session.IsPinned = contact.IsPinned
 					session.IsMinimized = contact.IsMinimized
+				}
+
+				// If no avatar found in contact table, use generated group avatar
+				if session.AvatarURL == "" {
+					session.AvatarURL = "/group-avatar/" + session.UserName
 				}
 			}
 
