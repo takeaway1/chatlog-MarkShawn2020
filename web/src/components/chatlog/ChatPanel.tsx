@@ -10,7 +10,7 @@ import { Loader2, MessageSquare, Download, Image as ImageIcon, ArrowLeft } from 
 import { selectedConversationAtom, conversationMessagesAtom, exportDialogOpenAtom } from '@/stores/chatlogStore';
 import { chatlogAPI, type Message } from '@/libs/ChatlogAPI';
 import { format } from 'date-fns';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ExportDialog } from './ExportDialog';
 
 export function ChatPanel() {
@@ -18,10 +18,18 @@ export function ChatPanel() {
   const [messages, setMessages] = useAtom(conversationMessagesAtom);
   const [exportDialogOpen, setExportDialogOpen] = useAtom(exportDialogOpenAtom);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     console.log('🎯 [ChatPanel] selectedConversation changed:', selectedConversation);
   }, [selectedConversation]);
+
+  // Auto scroll to bottom when messages load/change (no animation)
+  useEffect(() => {
+    if (messages.length > 0 && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
+    }
+  }, [messages]);
 
   // Fetch messages when conversation is selected
   const { data, isLoading, error } = useQuery({
@@ -254,6 +262,7 @@ export function ChatPanel() {
                 </div>
               );
             })}
+            <div ref={messagesEndRef} />
           </div>
         )}
       </div>
