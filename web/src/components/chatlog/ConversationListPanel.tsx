@@ -236,6 +236,7 @@ export function ConversationListPanel() {
           subtitle: session.content,
           time: dayjs(session.nTime).fromNow(),
           unreadCount: session.nUnReadCount,
+          isPinned: session.isPinned,
         }));
     }
 
@@ -338,6 +339,7 @@ export function ConversationListPanel() {
             <div className="divide-y divide-border">
               {items.map((item) => {
                 const isSelected = selectedConversation?.id === item.id && selectedConversation?.type === item.type;
+                const isPinned = 'isPinned' in item && item.isPinned;
 
                 return (
                   <button
@@ -345,7 +347,8 @@ export function ConversationListPanel() {
                     onClick={() => handleSelectItem(item)}
                     className={cn(
                       'w-full p-4 flex items-start gap-3 hover:bg-accent/50 transition-colors text-left',
-                      isSelected && 'bg-accent'
+                      isSelected && 'bg-accent',
+                      isPinned && 'bg-muted/20 border-l-2 border-muted-foreground/10'
                     )}
                   >
                     <Avatar className="w-12 h-12 flex-shrink-0">
