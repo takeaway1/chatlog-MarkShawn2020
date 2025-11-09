@@ -411,8 +411,9 @@ func (ds *DataSource) GetContacts(ctx context.Context, key string, limit, offset
 
 	if key != "" {
 		// 按照关键字查询
+		// When searching by key, allow chatrooms to be found (they might be in contact table)
 		query = `SELECT UserName, Alias, Remark, NickName, Reserved1, BigHeadImgUrl, SmallHeadImgUrl, HeadImgMd5 FROM Contact
-                WHERE (UserName = ? OR Alias = ? OR Remark = ? OR NickName = ?) AND UserName NOT LIKE '%@chatroom'`
+                WHERE (UserName = ? OR Alias = ? OR Remark = ? OR NickName = ?)`
 		args = []interface{}{key, key, key, key}
 	} else {
 		// 查询所有联系人
