@@ -343,7 +343,7 @@ export function ConversationListPanel() {
           <>
             {/* Pinned items */}
             {pinnedItems.length > 0 && (
-              <div className="border-b-2 border-border/50">
+              <div className="border-b border-border/30">
                 {pinnedItems.map((item) => {
                   const isSelected = selectedConversation?.id === item.id && selectedConversation?.type === item.type;
 
