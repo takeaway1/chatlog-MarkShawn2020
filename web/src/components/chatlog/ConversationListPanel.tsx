@@ -352,7 +352,7 @@ export function ConversationListPanel() {
                       onClick={() => handleSelectItem(item)}
                       className={cn(
                         'w-full p-4 flex items-start gap-3 hover:bg-accent/50 transition-colors text-left',
-                        'bg-muted/50 border-l-[3px] border-primary/40',
+                        'bg-muted/50',
                         isSelected && 'bg-accent'
                       )}
                     >
