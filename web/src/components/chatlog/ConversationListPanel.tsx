@@ -89,8 +89,16 @@ export function ConversationListPanel() {
     initialPageParam: 0,
   });
 
-  const isLoading = isLoadingSessions || isLoadingContacts || isLoadingChatrooms;
-  const error = sessionsError || contactsError || chatroomsError;
+  // Determine loading/error state based on active section
+  const isLoading =
+    (activeSection === 'chats' && isLoadingSessions) ||
+    (activeSection === 'contacts' && isLoadingContacts) ||
+    (activeSection === 'groups' && isLoadingChatrooms);
+
+  const error =
+    (activeSection === 'chats' && sessionsError) ||
+    (activeSection === 'contacts' && contactsError) ||
+    (activeSection === 'groups' && chatroomsError);
 
   // Flatten infinite query pages
   const sessions = sessionsData?.pages.flatMap(page => page.items) ?? [];
@@ -119,7 +127,7 @@ export function ConversationListPanel() {
   const items = (() => {
     const keyword = searchKeyword.toLowerCase();
 
-    if (activeSection === 'chats' && sessions.length > 0) {
+    if (activeSection === 'chats') {
       return sessions
         .filter(s =>
           !keyword ||
@@ -138,7 +146,7 @@ export function ConversationListPanel() {
         }));
     }
 
-    if (activeSection === 'contacts' && contacts.length > 0) {
+    if (activeSection === 'contacts') {
       return contacts
         .filter(c =>
           !keyword ||
@@ -155,7 +163,7 @@ export function ConversationListPanel() {
         }));
     }
 
-    if (activeSection === 'groups' && chatrooms.length > 0) {
+    if (activeSection === 'groups') {
       return chatrooms
         .filter(g =>
           !keyword ||
