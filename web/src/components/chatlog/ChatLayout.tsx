@@ -1,6 +1,7 @@
 'use client';
 
 import { useAtom } from 'jotai';
+import { useEffect } from 'react';
 import { MessageCircle } from 'lucide-react';
 import { NavigationSidebar } from './NavigationSidebar';
 import { ConversationListPanel } from './ConversationListPanel';
@@ -11,6 +12,10 @@ import { Badge } from '@/components/ui/badge';
 
 export function ChatLayout() {
   const [selectedConversation] = useAtom(selectedConversationAtom);
+
+  useEffect(() => {
+    console.log('📱 [ChatLayout] selectedConversation updated:', selectedConversation);
+  }, [selectedConversation]);
 
   return (
     <div className="min-h-screen bg-secondary/20 flex flex-col">
