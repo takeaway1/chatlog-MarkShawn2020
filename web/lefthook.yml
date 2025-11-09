@@ -7,6 +7,11 @@ commit-msg:
 # Validate content before committing
 pre-commit:
   commands:
+    update-version:
+      glob: 'src/**/*.{ts,tsx,js,jsx}'
+      run: node scripts/update-version-headers.js
+      stage_fixed: true
+      priority: 0
     lint:
       glob: '*'
       run: npx --no -- eslint --fix --no-warn-ignored --quiet
