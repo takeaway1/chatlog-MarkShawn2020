@@ -8,45 +8,45 @@ Next.js 15 frontend for Chatlog - a WeChat chat history viewer with Go backend i
 
 ## Development Commands
 
-**IMPORTANT**: Local dev server runs with `npm run dev` (starts both Next.js and Spotlight). DO NOT start additional dev servers.
+**IMPORTANT**: This project uses **pnpm** as package manager. Local dev server runs with `pnpm dev` (starts both Next.js and Spotlight). DO NOT start additional dev servers.
 
 ### Core Development
 ```bash
-npm run dev              # Start dev server (Next.js + Spotlight)
-npm run dev:chatlog      # Dev mode with chatlog-specific setup
-npm run check:types      # TypeScript type checking
-npm run lint:fix         # Auto-fix linting issues
-npm run commit           # Interactive commit (Commitizen)
+pnpm dev                 # Start dev server (Next.js + Spotlight)
+pnpm dev:chatlog         # Dev mode with chatlog-specific setup
+pnpm check:types         # TypeScript type checking
+pnpm lint:fix            # Auto-fix linting issues
+pnpm commit              # Interactive commit (Commitizen)
 ```
 
 ### Testing
 ```bash
-npm test                 # Unit tests (Vitest)
-npm run test:e2e         # E2E tests (Playwright)
-npm run storybook        # Component development
+pnpm test                # Unit tests (Vitest)
+pnpm test:e2e            # E2E tests (Playwright)
+pnpm storybook           # Component development
 ```
 
 ### Database
 ```bash
-npm run db:studio        # Open Drizzle Studio
-npm run db:generate      # Generate migrations after schema changes
-npm run db:push          # Push schema directly (use with caution)
+pnpm db:studio           # Open Drizzle Studio
+pnpm db:generate         # Generate migrations after schema changes
+pnpm db:push             # Push schema directly (use with caution)
 ```
 
 ### Version Management
 ```bash
-npm run version:bump     # Auto-bump version (analyzes commits)
-npm run version:patch    # Force patch (0.3.1 → 0.3.2)
-npm run version:minor    # Force minor (0.3.x → 0.4.0)
-npm run version:major    # Force major (0.x.x → 1.0.0)
+pnpm version:bump        # Auto-bump version (analyzes commits)
+pnpm version:patch       # Force patch (0.3.1 → 0.3.2)
+pnpm version:minor       # Force minor (0.3.x → 0.4.0)
+pnpm version:major       # Force major (0.x.x → 1.0.0)
 ```
 
 ### Build & Deployment
 ```bash
-npm run build            # Standard production build
-npm run build:static     # Static export for Go integration
-npm run build:chatlog    # Build + copy to Go backend
-npm run start            # Production server
+pnpm build               # Standard production build
+pnpm build:static        # Static export for Go integration
+pnpm build:chatlog       # Build + copy to Go backend
+pnpm start               # Production server
 ```
 
 ## Architecture Overview
@@ -114,8 +114,8 @@ scripts/
   - `/image/*`, `/video/*`, `/voice/*`, `/file/*`, `/data/*` → Go backend
 
 **Production Mode:**
-1. `npm run build:static` - Creates static export
-2. `npm run build:chatlog` - Copies to `../internal/chatlog/http/static/`
+1. `pnpm build:static` - Creates static export
+2. `pnpm build:chatlog` - Copies to `../internal/chatlog/http/static/`
 3. Go serves frontend at root path
 
 **API Client (`src/libs/ChatlogAPI.ts`):**
@@ -234,7 +234,7 @@ counterSchema { id, count, timestamps }
 
 **Release Process:**
 1. Develop features with conventional commits
-2. Run `npm run version:bump` (auto-detects version bump)
+2. Run `pnpm version:bump` (auto-detects version bump)
 3. Generates/updates `CHANGELOG.md`
 4. Creates git tag `vX.Y.Z`
 5. Push with `git push --follow-tags`
@@ -289,7 +289,7 @@ SENTRY_DSN=                    # Error monitoring
 
 ### Modifying Database Schema
 1. Edit `src/models/Schema.ts`
-2. Run `npm run db:generate` to create migration
+2. Run `pnpm db:generate` to create migration
 3. Migration applies automatically on next DB interaction
 4. No server restart needed
 
@@ -348,18 +348,19 @@ const imageUrl = ChatlogAPIClient.getImageURL(message.contents?.md5);
    - Version header updates
    - ESLint auto-fix
    - Type checking
-3. **Release**: `npm run version:bump`
+3. **Release**: `pnpm version:bump`
    - Auto-generates CHANGELOG
    - Creates git tag
    - Updates version files
 
 ### Common Pitfalls
 - Don't bypass pre-commit hooks (lefthook)
-- Don't use `npm run db:push` in production (use migrations)
-- Don't start multiple dev servers (use `npm run dev`)
+- Don't use `pnpm db:push` in production (use migrations)
+- Don't start multiple dev servers (use `pnpm dev`)
 - Don't forget to run Go backend for chatlog features
 - Don't commit `.env.local` (use `.env` for shared vars)
 - Don't modify `src/utils/version.ts` manually (auto-updated)
+- **Always use pnpm**, not npm or yarn
 
 ## Configuration Files
 
