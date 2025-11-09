@@ -30,6 +30,7 @@ type ContactV4 struct {
 	Remark         string `json:"remark"`
 	NickName       string `json:"nick_name"`
 	LocalType      int    `json:"local_type"` // 2 群聊; 3 群聊成员(非好友); 5,6 企业微信;
+	Flag           int    `json:"flag"`       // 位标志，Bit 11 (2048) 表示置顶
 	BigHeadUrl     string `json:"big_head_url"`
 	SmallHeadUrl   string `json:"small_head_url"`
 	HeadImgMd5     string `json:"head_img_md5"`
@@ -42,6 +43,7 @@ func (c *ContactV4) Wrap() *Contact {
 		Remark:          c.Remark,
 		NickName:        c.NickName,
 		IsFriend:        c.LocalType != 3,
+		IsPinned:        (c.Flag & 2048) != 0, // Bit 11 表示置顶
 		BigHeadImgUrl:   c.BigHeadUrl,
 		SmallHeadImgUrl: c.SmallHeadUrl,
 		HeadImgMd5:      c.HeadImgMd5,

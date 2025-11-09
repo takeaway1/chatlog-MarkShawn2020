@@ -31,6 +31,9 @@ func (r *Repository) GetSessions(ctx context.Context, key string, limit, offset 
 			} else if contact.BigHeadImgUrl != "" {
 				session.AvatarURL = contact.BigHeadImgUrl
 			}
+
+			// Set pinned status from contact
+			session.IsPinned = contact.IsPinned
 		} else if chatroom, err := r.GetChatRoom(ctx, session.UserName); err == nil && chatroom != nil {
 			// For chatrooms, use chatroom display name
 			session.NickName = chatroom.DisplayName()

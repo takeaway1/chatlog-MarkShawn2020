@@ -370,13 +370,13 @@ func (ds *DataSource) GetContacts(ctx context.Context, key string, limit, offset
 
 	if key != "" {
 		// 按照关键字查询
-		query = `SELECT username, local_type, alias, remark, nick_name, big_head_url, small_head_url, head_img_md5
+		query = `SELECT username, local_type, flag, alias, remark, nick_name, big_head_url, small_head_url, head_img_md5
 				FROM contact
 				WHERE (username = ? OR alias = ? OR remark = ? OR nick_name = ?) AND username NOT LIKE '%@chatroom'`
 		args = []interface{}{key, key, key, key}
 	} else {
 		// 查询所有联系人
-		query = `SELECT username, local_type, alias, remark, nick_name, big_head_url, small_head_url, head_img_md5 FROM contact WHERE username NOT LIKE '%@chatroom'`
+		query = `SELECT username, local_type, flag, alias, remark, nick_name, big_head_url, small_head_url, head_img_md5 FROM contact WHERE username NOT LIKE '%@chatroom'`
 	}
 
 	// 添加排序、分页
@@ -405,6 +405,7 @@ func (ds *DataSource) GetContacts(ctx context.Context, key string, limit, offset
 		err := rows.Scan(
 			&contactV4.UserName,
 			&contactV4.LocalType,
+			&contactV4.Flag,
 			&contactV4.Alias,
 			&contactV4.Remark,
 			&contactV4.NickName,
@@ -549,21 +550,16 @@ func (ds *DataSource) GetSessions(ctx context.Context, key string, limit, offset
 
 	if key != "" {
 		// 按照关键字查询
-		query = `SELECT username, summary, last_timestamp, last_msg_sender, last_sender_display_name, unread_count, is_hidden, sort_timestamp, status
+		query = `SELECT username, summary, last_timestamp, last_msg_sender, last_sender_display_name, unread_count
 				FROM SessionTable
 				WHERE username = ? OR last_sender_display_name = ?
-				ORDER BY
-					CASE WHEN sort_timestamp > last_timestamp THEN 0 ELSE 1 END,
-					sort_timestamp DESC`
+				ORDER BY sort_timestamp DESC`
 		args = []interface{}{key, key}
 	} else {
 		// 查询所有会话
-		// Order: pinned sessions (sort_timestamp > last_timestamp) first, then by sort_timestamp DESC
-		query = `SELECT username, summary, last_timestamp, last_msg_sender, last_sender_display_name, unread_count, is_hidden, sort_timestamp, status
+		query = `SELECT username, summary, last_timestamp, last_msg_sender, last_sender_display_name, unread_count
 				FROM SessionTable
-				ORDER BY
-					CASE WHEN sort_timestamp > last_timestamp THEN 0 ELSE 1 END,
-					sort_timestamp DESC`
+				ORDER BY sort_timestamp DESC`
 	}
 
 	// 添加分页
@@ -595,9 +591,6 @@ func (ds *DataSource) GetSessions(ctx context.Context, key string, limit, offset
 			&sessionV4.LastMsgSender,
 			&sessionV4.LastSenderDisplayName,
 			&sessionV4.UnreadCount,
-			&sessionV4.IsHidden,
-			&sessionV4.SortTimestamp,
-			&sessionV4.Status,
 		)
 
 		if err != nil {

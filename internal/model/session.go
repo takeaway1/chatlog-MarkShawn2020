@@ -14,11 +14,7 @@ type Session struct {
 	AvatarURL    string    `json:"avatarUrl,omitempty"`
 	ParentRef    string    `json:"parentRef"`
 	NUnReadCount int       `json:"nUnReadCount"`
-
-	// Extended fields for UI features (WeChat 4.x fully supported, WeChat 3.x limited)
-	IsTopPinned  bool      `json:"isTopPinned,omitempty"`  // Whether session is pinned to top
-	IsHidden     bool      `json:"isHidden,omitempty"`     // Whether session is minimized/hidden
-	SortOrder    int64     `json:"sortOrder"`              // Sort timestamp for ordering (always present)
+	IsPinned     bool      `json:"isPinned"`
 }
 
 // CREATE TABLE Session(
@@ -50,9 +46,9 @@ type SessionV3 struct {
 	StrNickName string `json:"strNickName"`
 	StrContent  string `json:"strContent"`
 	NTime       int64  `json:"nTime"`
-	ParentRef   string `json:"parentRef"`
 
 	// NUnReadCount int    `json:"nUnReadCount"`
+	// ParentRef    string `json:"parentRef"`
 	// Reserved0    int    `json:"Reserved0"`
 	// Reserved1    string `json:"Reserved1"`
 	// NStatus      int    `json:"nStatus"`
@@ -70,18 +66,12 @@ type SessionV3 struct {
 }
 
 func (s *SessionV3) Wrap() *Session {
-	// For V3, we don't have explicit is_hidden field
-	// ParentRef might be used for grouping or pinning, but exact meaning is unclear
-	// SortOrder uses nOrder which already reflects the sort order
 	return &Session{
-		UserName:  s.StrUsrName,
-		NOrder:    s.NOrder,
-		NickName:  s.StrNickName,
-		Content:   s.StrContent,
-		NTime:     time.Unix(int64(s.NTime), 0),
-		ParentRef: s.ParentRef,
-		SortOrder: int64(s.NOrder),
-		// IsTopPinned and IsHidden would need further analysis of actual data patterns
+		UserName: s.StrUsrName,
+		NOrder:   s.NOrder,
+		NickName: s.StrNickName,
+		Content:  s.StrContent,
+		NTime:    time.Unix(int64(s.NTime), 0),
 	}
 }
 

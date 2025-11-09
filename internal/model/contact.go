@@ -1,14 +1,15 @@
 package model
 
 type Contact struct {
-	UserName       string `json:"userName"`
-	Alias          string `json:"alias"`
-	Remark         string `json:"remark"`
-	NickName       string `json:"nickName"`
-	IsFriend       bool   `json:"isFriend"`
-	BigHeadImgUrl  string `json:"bigHeadImgUrl,omitempty"`
+	UserName        string `json:"userName"`
+	Alias           string `json:"alias"`
+	Remark          string `json:"remark"`
+	NickName        string `json:"nickName"`
+	IsFriend        bool   `json:"isFriend"`
+	IsPinned        bool   `json:"isPinned"`
+	BigHeadImgUrl   string `json:"bigHeadImgUrl,omitempty"`
 	SmallHeadImgUrl string `json:"smallHeadImgUrl,omitempty"`
-	HeadImgMd5     string `json:"headImgMd5,omitempty"`
+	HeadImgMd5      string `json:"headImgMd5,omitempty"`
 }
 
 // CREATE TABLE Contact(
