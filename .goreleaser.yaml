@@ -92,9 +92,11 @@ release:
 # Docker 镜像配置
 # FIXME: 等待 goreleaser 2.12 更新后使用 dockers_v2
 dockers:
-  - image_templates:
+  # GitHub Container Registry - amd64
+  - ids:
+      - chatlog-builds
+    image_templates:
       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/chatlog:{{ .Tag }}-amd64"
-      - "{{ .Env.DOCKERHUB_USERNAME }}/chatlog:{{ .Tag }}-amd64"
     dockerfile: Dockerfile
     extra_files:
       - script/docker-entrypoint.sh
@@ -112,8 +114,55 @@ dockers:
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.licenses=Apache-2.0"
 
-  - image_templates:
+  # GitHub Container Registry - arm64
+  - ids:
+      - chatlog-builds
+    image_templates:
       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/chatlog:{{ .Tag }}-arm64"
+    dockerfile: Dockerfile
+    extra_files:
+      - script/docker-entrypoint.sh
+    use: buildx
+    goos: linux
+    goarch: arm64
+    build_flag_templates:
+      - "--platform=linux/arm64"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.description=chat log tool, easily use your own chat data."
+      - "--label=org.opencontainers.image.url=https://github.com/{{ .Env.GITHUB_REPOSITORY }}"
+      - "--label=org.opencontainers.image.source=https://github.com/{{ .Env.GITHUB_REPOSITORY }}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.licenses=Apache-2.0"
+
+  # Docker Hub - amd64 (仅在设置了 DOCKERHUB_USERNAME 时构建)
+  - ids:
+      - chatlog-builds
+    image_templates:
+      - "{{ .Env.DOCKERHUB_USERNAME }}/chatlog:{{ .Tag }}-amd64"
+    dockerfile: Dockerfile
+    extra_files:
+      - script/docker-entrypoint.sh
+    use: buildx
+    goos: linux
+    goarch: amd64
+    skip_push: auto
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.description=chat log tool, easily use your own chat data."
+      - "--label=org.opencontainers.image.url=https://github.com/{{ .Env.GITHUB_REPOSITORY }}"
+      - "--label=org.opencontainers.image.source=https://github.com/{{ .Env.GITHUB_REPOSITORY }}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.licenses=Apache-2.0"
+
+  # Docker Hub - arm64 (仅在设置了 DOCKERHUB_USERNAME 时构建)
+  - ids:
+      - chatlog-builds
+    image_templates:
       - "{{ .Env.DOCKERHUB_USERNAME }}/chatlog:{{ .Tag }}-arm64"
     dockerfile: Dockerfile
     extra_files:
@@ -121,6 +170,7 @@ dockers:
     use: buildx
     goos: linux
     goarch: arm64
+    skip_push: auto
     build_flag_templates:
       - "--platform=linux/arm64"
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
@@ -140,20 +190,21 @@ docker_manifests:
       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/chatlog:{{ .Tag }}-amd64"
       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/chatlog:{{ .Tag }}-arm64"
 
-  # Docker Hub manifests
+  - name_template: "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/chatlog:latest"
+    image_templates:
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/chatlog:{{ .Tag }}-amd64"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/chatlog:{{ .Tag }}-arm64"
+    skip_push: auto
+
+  # Docker Hub manifests (仅在设置了 DOCKERHUB_USERNAME 时推送)
   - name_template: "{{ .Env.DOCKERHUB_USERNAME }}/chatlog:{{ .Tag }}"
     image_templates:
       - "{{ .Env.DOCKERHUB_USERNAME }}/chatlog:{{ .Tag }}-amd64"
       - "{{ .Env.DOCKERHUB_USERNAME }}/chatlog:{{ .Tag }}-arm64"
+    skip_push: auto
 
-  # GitHub Container Registry latest
-  - name_template: "{{ if not .Prerelease }}ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/chatlog:latest{{ end }}"
-    image_templates:
-      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/chatlog:{{ .Tag }}-amd64"
-      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/chatlog:{{ .Tag }}-arm64"
-
-  # Docker Hub latest
-  - name_template: "{{ if not .Prerelease }}{{ .Env.DOCKERHUB_USERNAME }}/chatlog:latest{{ end }}"
+  - name_template: "{{ .Env.DOCKERHUB_USERNAME }}/chatlog:latest"
     image_templates:
       - "{{ .Env.DOCKERHUB_USERNAME }}/chatlog:{{ .Tag }}-amd64"
       - "{{ .Env.DOCKERHUB_USERNAME }}/chatlog:{{ .Tag }}-arm64"
+    skip_push: auto
